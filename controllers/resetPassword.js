@@ -7,6 +7,8 @@ const User = require("../models/user");
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
+console.log("\n\n\n  ", process.env.SENDGRID_API_KEY, "\n\n\n");
+
 exports.forgotPass = async (req, res, next) => {
   try {
     const { email } = req.body;
