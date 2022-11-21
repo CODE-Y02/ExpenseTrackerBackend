@@ -3,7 +3,7 @@ const Sequelize = require("sequelize");
 // with Sequelize we dont neewd to write sql queries manually
 
 const dotenv = require("dotenv");
-dotenv.config({ path: "../.env" });
+dotenv.config();
 
 const sequelize = new Sequelize(
   process.env.DB_NAME,
