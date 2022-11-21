@@ -6,7 +6,7 @@ const { convertFromJSON_to_CSV } = require("../util/converters");
 
 // services
 const { uploadToS3 } = require("../services/S3service");
-const { getExpenses, getDownloads } = require("../services/userservices");
+const { getExpenses, getDownloads } = require("../services/userServices");
 
 module.exports.postAddExpense = async (req, res, next) => {
   try {
