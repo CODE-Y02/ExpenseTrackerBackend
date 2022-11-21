@@ -80,8 +80,8 @@ app.use("/", (req, res) => {
 
 const startApp = async () => {
   try {
-    // await sequelize.sync({ force: true });
-    await sequelize.sync();
+    await sequelize.sync({ force: true });
+    // await sequelize.sync();
 
     // ssl
     // https
