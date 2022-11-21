@@ -1,0 +1,16 @@
+#folders
+node_modules
+files
+
+#files
+access.log
+
+
+
+# environments
+.env
+sendgrid.env
+
+
+#certificates
+server.key
