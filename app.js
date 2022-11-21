@@ -94,7 +94,13 @@ const startApp = async () => {
     //     );
     //   });
 
-    app.listen(process.env.PORT || 3000); // NO ssl
+    app.listen(process.env.PORT || 3000, () => {
+      console.log(
+        `\n\n expenseTracker server is running at  ${
+          process.env.PORT || 3000
+        } PORT \n\n`
+      );
+    }); // NO ssl
   } catch (error) {
     console.log("\n \n \n \n ");
     console.log({ errorMsg: error.message, error });
