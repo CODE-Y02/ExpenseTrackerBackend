@@ -74,10 +74,8 @@ app.use("/payment", paymentRouter);
 app.use("/password", passwordRoute);
 app.use("/leaderboard", leaderBoardRoute);
 
-app.use((req, res) => {
-  console.log("\n\n", req.url);
-  res.setHeader("Content-Security-Policy", "'self' 'https://cdn.jsdelivr.net'");
-  res.sendFile(path.join(__dirname, `public/${req.url}`));
+app.use("/", (req, res) => {
+  res.status(404).json({ success: false, message: "Page Not Found " });
 });
 
 // /expense-report/-->  download --> get all expense of user and download them as list
