@@ -65,6 +65,8 @@ ForgotPassword.belongsTo(User);
 User.hasMany(Download);
 Download.belongsTo(User);
 
+app.use(express.static(path.join(__dirname, "public")));
+
 app.use("/user", userRoutes);
 app.use("/expense", expenseRouter);
 app.use("/payment", paymentRouter);
@@ -72,8 +74,10 @@ app.use("/payment", paymentRouter);
 app.use("/password", passwordRoute);
 app.use("/leaderboard", leaderBoardRoute);
 
-app.use("/", (req, res) => {
-  res.status(404).json({ success: false });
+app.use((req, res) => {
+  console.log("\n\n", req.url);
+  res.setHeader("Content-Security-Policy", "'self' 'https://cdn.jsdelivr.net'");
+  res.sendFile(path.join(__dirname, `public/${req.url}`));
 });
 
 // /expense-report/-->  download --> get all expense of user and download them as list
