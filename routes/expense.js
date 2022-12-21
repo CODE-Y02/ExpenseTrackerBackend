@@ -28,6 +28,6 @@ router.post("/addExpense", authentication, expenseController.postAddExpense);
 //   expenseController.getExpenseReportDownloadHistory
 // );
 
-// router.get("", authentication, expenseController.getAllExpense);
+router.get("", authentication, expenseController.getAllExpense);
 
 module.exports = router;

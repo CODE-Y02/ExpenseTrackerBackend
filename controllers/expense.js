@@ -29,12 +29,6 @@ module.exports.postAddExpense = async (req, res, next) => {
 
     await req.user.addExpense(expense);
 
-    // let expense = await req.user.createExpense({
-    //   expenseAmount,
-    //   category,
-    //   description,
-    // });
-
     //  leaderboard
 
     // let leaderBoard = await req.user.getLeaderBoard();
@@ -62,75 +56,57 @@ module.exports.postAddExpense = async (req, res, next) => {
   }
 };
 
-// module.exports.getAllExpense = async (req, res, next) => {
-//   try {
-//     // let expenses = await Expense.findAll({ where: { userId: req.user.id } });
+module.exports.getAllExpense = async (req, res, next) => {
+  try {
+    // let expenses = await Expense.findAll({ where: { userId: req.user.id } });
 
-//     let page = parseInt(req.query.page) || 1;
-//     let limit = parseInt(req.query.limit);
+    let page = parseInt(req.query.page) || 1;
+    let limit = parseInt(req.query.limit);
 
-//     if (limit > 20 || limit < 1 || !limit) limit = 5;
+    if (limit > 20 || limit < 1 || !limit) limit = 5;
 
-//     let totalCount = 0;
-//     totalCount = await Expense.count({ where: { userId: req.user.id } });
-//     const lastPage = Math.ceil(totalCount / limit);
+    // totalCount = await Expense.count({ where: { userId: req.user.id } });
+    let totalCount = req.user.expenseDetails.expenses.length || 0;
+    const lastPage = Math.ceil(totalCount / limit);
 
-//     const offset = (page - 1) * limit;
+    const offset = (page - 1) * limit;
 
-//     const pagination = {
-//       offset,
-//       limit,
-//     };
+    let expenses = await Expense.find({ user: req.user._id })
+      .select("expenseAmount catagory description")
+      .limit(limit)
+      .skip(offset);
 
-//     let expenses = await getExpenses(req, pagination);
+    if (expenses.length == 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No Expense Found",
+      });
+    }
 
-//     // let expenses = await getExpenses(req, pagination);
-//     // console.log("\n \n \n ", limit);
+    let pagiInfo = {
+      total: totalCount,
+      hasNextPage: limit * page < totalCount,
+      hasPrevPage: page > 1,
+      nextPg: page + 1,
+      prevPg: page - 1,
+      lastPage: lastPage,
+      limit,
+    };
 
-//     if (expenses.length == 0) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "No Expense Found",
-//       });
-//     }
-
-//     expenses = expenses.map((expenseObj) => {
-//       const { id, expenseAmount, category, description, updatedAt, createdAt } =
-//         expenseObj;
-//       return {
-//         id,
-//         expenseAmount,
-//         category,
-//         description,
-//         createdAt,
-//         updatedAt,
-//       };
-//     });
-
-//     let pagiInfo = {
-//       total: totalCount,
-//       hasNextPage: limit * page < totalCount,
-//       hasPrevPage: page > 1,
-//       nextPg: page + 1,
-//       prevPg: page - 1,
-//       lastPage: lastPage,
-//       limit,
-//     };
-
-//     res.status(200).json({
-//       success: true,
-//       message: "Found All Expenses",
-//       expenses,
-//       ...pagiInfo,
-//     });
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).json({
-//       success: false,
-//       message: error.message,
-//     });
-//   }
-// };
+    res.status(200).json({
+      success: true,
+      message: "Found All Expenses",
+      expenses,
+      ...pagiInfo,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 // // delete users expense
 // module.exports.deleteExpense = async (req, res, next) => {
@@ -238,7 +214,7 @@ module.exports.postAddExpense = async (req, res, next) => {
 //   }
 // };
 
-// // get download history
+// get download history
 // module.exports.getExpenseReportDownloadHistory = async (req, res) => {
 //   try {
 //     const where = {
