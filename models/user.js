@@ -27,6 +27,16 @@ const userSchema = new Schema({
   },
 });
 
+userSchema.methods.addExpense = function (expense) {
+  // expense is obj
+  this.expenseDetails.expenses.push(expense._id);
+  const oldTotal = this.expenseDetails.total || 0;
+  // update expense amount total
+  this.expenseDetails.total = oldTotal + expense.expenseAmount;
+
+  return this.save();
+};
+
 module.exports = model("User", userSchema);
 
 // const Sequelize = require("sequelize");

@@ -25,7 +25,7 @@ app.use(bodyParser.json());
 
 // import routes
 const userRoutes = require("./routes/user");
-// const expenseRouter = require("./routes/expense");
+const expenseRouter = require("./routes/expense");
 // const paymentRouter = require("./routes/payment");
 // const passwordRoute = require("./routes/password");
 // const leaderBoardRoute = require("./routes/leaderboard");
@@ -69,7 +69,7 @@ app.use(morgan("combined", { stream: accessLogStream }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/user", userRoutes);
-// app.use("/expense", expenseRouter);
+app.use("/expense", expenseRouter);
 // app.use("/payment", paymentRouter);
 
 // app.use("/password", passwordRoute);

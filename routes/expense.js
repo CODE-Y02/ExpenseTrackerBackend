@@ -8,26 +8,26 @@ const { authentication, isPremiumUser } = require("../middleware/auth");
 
 router.post("/addExpense", authentication, expenseController.postAddExpense);
 
-router.delete(
-  "/delete/:expenseId",
-  authentication,
-  expenseController.deleteExpense
-);
+// router.delete(
+//   "/delete/:expenseId",
+//   authentication,
+//   expenseController.deleteExpense
+// );
 
-router.get(
-  "/download",
-  authentication,
-  isPremiumUser,
-  expenseController.downloadExpenseReport
-);
+// router.get(
+//   "/download",
+//   authentication,
+//   isPremiumUser,
+//   expenseController.downloadExpenseReport
+// );
 
-router.get(
-  "/download/history",
-  authentication,
-  isPremiumUser,
-  expenseController.getExpenseReportDownloadHistory
-);
+// router.get(
+//   "/download/history",
+//   authentication,
+//   isPremiumUser,
+//   expenseController.getExpenseReportDownloadHistory
+// );
 
-router.get("", authentication, expenseController.getAllExpense);
+// router.get("", authentication, expenseController.getAllExpense);
 
 module.exports = router;
