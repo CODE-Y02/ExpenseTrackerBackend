@@ -29,13 +29,11 @@ exports.postSignUp = async (req, res, next) => {
           })
           .catch((error) => {
             console.log(error);
-            return res
-              .status(409)
-              .json({
-                success: false,
-                error: error.message,
-                message: " Email Already exist ",
-              });
+            return res.status(409).json({
+              success: false,
+              error: error.message,
+              message: " Email Already exist ",
+            });
           });
       });
     });
@@ -52,9 +50,7 @@ exports.postSignIn = async (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
 
-    let user = await User.findAll({
-      where: { email: email },
-    });
+    let user = await User.find({ email: email });
 
     if (user.length == 0) {
       return res.status(404).json({ success: false, error: "User Not Found" });
@@ -62,7 +58,7 @@ exports.postSignIn = async (req, res, next) => {
 
     const hash = user[0].password;
 
-    const { membership } = user[0];
+    const { premium } = user[0];
 
     bcrypt.compare(password, hash, function (err, result) {
       // result == true
@@ -73,7 +69,7 @@ exports.postSignIn = async (req, res, next) => {
           success: true,
           message: "Login successfull",
           Token: generateAccessToken(user[0].id, user[0].name),
-          membership,
+          memberhip: premium,
         });
       } else {
         return res.status(401).json({
