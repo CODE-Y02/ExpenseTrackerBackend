@@ -13,20 +13,29 @@ exports.postSignUp = async (req, res, next) => {
     bcrypt.genSalt(saltRounds, (err, salt) => {
       bcrypt.hash(password, salt, (err, hash) => {
         if (err) throw new Error("Something Went Wrong");
-        User.create({ name, email, password: hash })
-          .then((user) => {
+
+        const user = new User({
+          name,
+          email,
+          password: hash,
+        });
+
+        user
+          .save()
+          .then((result) => {
             res
               .status(201)
               .json({ success: true, message: "SignUp successful" });
           })
           .catch((error) => {
-            console.log("\n \n \n \n ");
             console.log(error);
-            return res.status(409).json({
-              success: false,
-              error: error.message,
-              message: " Email Already exist ",
-            });
+            return res
+              .status(409)
+              .json({
+                success: false,
+                error: error.message,
+                message: " Email Already exist ",
+              });
           });
       });
     });

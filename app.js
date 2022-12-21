@@ -6,10 +6,11 @@ const morgan = require("morgan");
 const fs = require("fs");
 const path = require("path");
 
+const mongoose = require("mongoose");
+
 const compression = require("compression");
 
 const bodyParser = require("body-parser");
-const sequelize = require("./util/database");
 
 dotenv.config();
 
@@ -24,18 +25,18 @@ app.use(bodyParser.json());
 
 // import routes
 const userRoutes = require("./routes/user");
-const expenseRouter = require("./routes/expense");
-const paymentRouter = require("./routes/payment");
-const passwordRoute = require("./routes/password");
-const leaderBoardRoute = require("./routes/leaderboard");
+// const expenseRouter = require("./routes/expense");
+// const paymentRouter = require("./routes/payment");
+// const passwordRoute = require("./routes/password");
+// const leaderBoardRoute = require("./routes/leaderboard");
 
 // import models
-const User = require("./models/user");
-const Expense = require("./models/expense");
-const Order = require("./models/order");
-const LeaderBoard = require("./models/leaderboard");
-const ForgotPassword = require("./models/forgotPassword");
-const Download = require("./models/download");
+// const User = require("./models/user");
+// const Expense = require("./models/expense");
+// const Order = require("./models/order");
+// const LeaderBoard = require("./models/leaderboard");
+// const ForgotPassword = require("./models/forgotPassword");
+// const Download = require("./models/download");
 
 // log
 const accessLogStream = fs.createWriteStream(
@@ -50,29 +51,29 @@ app.use(compression()); // compress response
 app.use(morgan("combined", { stream: accessLogStream }));
 
 // Association
-User.hasMany(Expense);
-Expense.belongsTo(User);
+// User.hasMany(Expense);
+// Expense.belongsTo(User);
 
-User.hasMany(Order);
-Order.belongsTo(User);
+// User.hasMany(Order);
+// Order.belongsTo(User);
 
-LeaderBoard.belongsTo(User);
-User.hasOne(LeaderBoard);
+// LeaderBoard.belongsTo(User);
+// User.hasOne(LeaderBoard);
 
-User.hasMany(ForgotPassword);
-ForgotPassword.belongsTo(User);
+// User.hasMany(ForgotPassword);
+// ForgotPassword.belongsTo(User);
 
-User.hasMany(Download);
-Download.belongsTo(User);
+// User.hasMany(Download);
+// Download.belongsTo(User);
 
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/user", userRoutes);
-app.use("/expense", expenseRouter);
-app.use("/payment", paymentRouter);
+// app.use("/expense", expenseRouter);
+// app.use("/payment", paymentRouter);
 
-app.use("/password", passwordRoute);
-app.use("/leaderboard", leaderBoardRoute);
+// app.use("/password", passwordRoute);
+// app.use("/leaderboard", leaderBoardRoute);
 
 app.use("/", (req, res) => {
   res.status(404).json({ success: false, message: "Page Not Found " });
@@ -82,8 +83,9 @@ app.use("/", (req, res) => {
 
 const startApp = async () => {
   try {
-    // await sequelize.sync({ force: true });
-    await sequelize.sync();
+    await mongoose.connect(
+      `mongodb+srv://${process.env.MongoUser}:${process.env.MongoPass}@${process.env.MongoCluster}.cko8cat.mongodb.net/${process.env.MongoDataBase}?retryWrites=true&w=majority`
+    );
 
     // ssl
     // https
