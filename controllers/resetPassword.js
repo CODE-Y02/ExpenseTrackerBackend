@@ -20,7 +20,7 @@ exports.forgotPass = async (req, res, next) => {
 
     // console.log(email);
 
-    let user = await User.findOne({ where: { email } });
+    let user = await User.findOne({ email: email });
 
     if (!user) {
       //if user not found then
@@ -32,11 +32,18 @@ exports.forgotPass = async (req, res, next) => {
     // else create user pass reset link
     const passResetId = uuid.v4();
 
-    await ForgotPassword.create({
-      id: passResetId,
+    // await ForgotPassword.create({
+    //   id: passResetId,
+    //   active: true,
+    //   userId: user._id,
+    // });
+
+    await new ForgotPassword({
+      passResetId: passResetId,
+      user: req.user._id,
       active: true,
-      userId: user.id,
-    });
+    }).save();
+
     console.log("=============>\n Passres id ==> \n", passResetId, "\n\n");
 
     const msg = {
@@ -65,11 +72,11 @@ exports.resetPassLinkVerification = async (req, res, next) => {
     const passResetId = req.params.passResetId;
     // finding password forgotpass request of user
     let forgotPassReq = await ForgotPassword.findOne({
-      where: { id: passResetId },
+      passResetId: passResetId,
     });
 
     if (forgotPassReq && forgotPassReq.active) {
-      await forgotPassReq.update({ active: false });
+      await forgotPassReq.updateOne({ active: false });
 
       //send form to reset pass
       res.status(200).send(`
@@ -109,13 +116,12 @@ exports.resetPassword = async (req, res, next) => {
     const { newPassword } = req.body;
 
     let forgotPassReq = await ForgotPassword.findOne({
-      where: {
-        id: passResetId,
-      },
-    });
+      passResetId: passResetId,
+    }).populate("user", "name email password _id");
 
     // get user who's forgotPassReq is
-    let user = await forgotPassReq.getUser();
+    let user = forgotPassReq.user;
+
     console.log("\n\n ====================> \n \n", user, "\n\n");
     if (user) {
       //   console.log("\n\n ====================> \n \n", user, "\n\n");
@@ -131,15 +137,17 @@ exports.resetPassword = async (req, res, next) => {
             console.log(err);
             throw new Error(err);
           }
-          user.update({ password: hash }).then(() => {
-            res
-              .status(201)
-              .json({ message: "Successfuly update the new password" });
-          });
+          User.findByIdAndUpdate({ _id: user._id }, { password: hash }).then(
+            () => {
+              res
+                .status(201)
+                .json({ message: "Successfuly update the new password" });
+            }
+          );
         });
       });
 
-      await forgotPassReq.destroy();
+      await forgotPassReq.deleteOne();
     } else {
       return res.status(404).json({ error: "No user Exists", success: false });
     }

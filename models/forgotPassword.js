@@ -1,13 +1,18 @@
-const Sequelize = require("sequelize");
-const sequelize = require("../util/database");
+const { Schema, model } = require("mongoose");
 
-const ForgotPassword = sequelize.define("forgotpassword", {
-  id: {
-    type: Sequelize.UUID,
-    allowNull: false,
-    primaryKey: true,
+// we will design it in such a way that user can have one forgot pass link at a time and once clicked it will be deactivated
+const forgotPassSchema = new Schema({
+  user: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: "User",
   },
-  active: Sequelize.BOOLEAN,
+  active: Boolean,
+  passResetId: {
+    type: String,
+    uniquie: true,
+    required: true,
+  },
 });
 
-module.exports = ForgotPassword;
+module.exports = model("ForgotPassword", forgotPassSchema);
