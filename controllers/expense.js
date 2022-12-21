@@ -108,55 +108,74 @@ module.exports.getAllExpense = async (req, res, next) => {
   }
 };
 
-// // delete users expense
-// module.exports.deleteExpense = async (req, res, next) => {
-//   try {
-//     const expenseId = req.params.expenseId;
+// delete users expense
+module.exports.deleteExpense = async (req, res, next) => {
+  try {
+    const expenseId = req.params.expenseId;
 
-//     if (!expenseId) {
-//       return res.status(400).json({ success: false, message: "Bad Request" });
-//     }
-//     let user = req.user;
+    if (!expenseId) {
+      return res.status(400).json({ success: false, message: "Bad Request" });
+    }
 
-//     // console.log(user);
+    // delete expense
 
-//     let expense = await Expense.findOne({
-//       where: {
-//         id: expenseId,
-//         userId: user.id,
-//       },
-//     });
-//     // console.log("\n \n \n ", expense, "\n \n");
-//     if (!expense) {
-//       return res.status(401).json({
-//         success: false,
-//         message: "Expense Does Not Belongs to User",
-//         error: " Unauthorized Request",
-//       });
-//     }
+    let expense = await Expense.find({
+      _id: expenseId,
+      user: req.user._id,
+    });
 
-//     //  leaderboard
+    if (!expense || expense.length === 0) {
+      return res.status(401).json({
+        success: false,
+        message: "Expense Does Not Belongs to User",
+        error: " Unauthorized Request",
+      });
+    }
 
-//     let leaderBoard = await req.user.getLeaderBoard();
-//     if (!leaderBoard) {
-//       leaderBoard = await req.user.createLeaderBoard({
-//         userName: req.user.name,
-//       });
-//     }
+    // console.log("\n \n \n ", expense, "\n \n");
 
-//     let total = leaderBoard.totalExpenses - Number(expense.expenseAmount);
-//     leaderBoard.update({ totalExpenses: total });
+    // delete expense
 
-//     await expense.destroy();
-//     res.json({ success: true, message: "Expense Deleted Successfully" });
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).json({
-//       success: false,
-//       message: error.message,
-//     });
-//   }
-// };
+    await Expense.findByIdAndDelete({ _id: expenseId });
+
+    const oldExp = req.user.expenseDetails.expenses;
+
+    const oldTotal = req.user.expenseDetails.total;
+
+    const updatedExp = oldExp.filter(
+      (expId) => expId.toString() !== expenseId.toString()
+    );
+    const newTotal = oldTotal - Number(expense[0].expenseAmount);
+
+    await req.user.updateOne({
+      expenseDetails: {
+        total: newTotal,
+        expenses: updatedExp,
+      },
+    });
+
+    //  leaderboard
+
+    // let leaderBoard = await req.user.getLeaderBoard();
+    // if (!leaderBoard) {
+    //   leaderBoard = await req.user.createLeaderBoard({
+    //     userName: req.user.name,
+    //   });
+    // }
+
+    // let total = leaderBoard.totalExpenses - Number(expense.expenseAmount);
+    // leaderBoard.update({ totalExpenses: total });
+
+    // await expense.destroy();
+    res.json({ success: true, message: "Expense Deleted Successfully" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 // //doenload expense
 // module.exports.downloadExpenseReport = async (req, res) => {
