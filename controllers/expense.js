@@ -196,25 +196,6 @@ module.exports.downloadExpenseReport = async (req, res) => {
       });
     }
 
-    // expenses = expenses.map((expenseObj) => {
-    //   const {
-    //     _id,
-    //     expenseAmount,
-    //     category,
-    //     description,
-    //     updatedAt,
-    //     createdAt,
-    //   } = expenseObj;
-    //   return {
-    //     id: _id,
-    //     expenseAmount,
-    //     category,
-    //     description,
-    //     createdAt,
-    //     updatedAt,
-    //   };
-    // });
-
     let csv = await convertFromJSON_to_CSV(expenses);
     //we are gonna send this csv to aws
 
