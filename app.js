@@ -26,7 +26,7 @@ app.use(bodyParser.json());
 // import routes
 const userRoutes = require("./routes/user");
 const expenseRouter = require("./routes/expense");
-// const paymentRouter = require("./routes/payment");
+const paymentRouter = require("./routes/payment");
 // const passwordRoute = require("./routes/password");
 // const leaderBoardRoute = require("./routes/leaderboard");
 
@@ -70,7 +70,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/user", userRoutes);
 app.use("/expense", expenseRouter);
-// app.use("/payment", paymentRouter);
+app.use("/payment", paymentRouter);
 
 // app.use("/password", passwordRoute);
 // app.use("/leaderboard", leaderBoardRoute);

@@ -23,8 +23,20 @@ const userSchema = new Schema({
       type: Number,
     },
 
-    expenses: [Schema.Types.ObjectId],
+    expenses: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Expense",
+      },
+    ],
   },
+
+  orders: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Order",
+    },
+  ],
 });
 
 userSchema.methods.addExpense = function (expense) {

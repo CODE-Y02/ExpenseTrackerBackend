@@ -25,7 +25,7 @@ exports.postcreateOrder = async (req, res, next) => {
       //   console.log(order);
       // console.log(id, amount, status, currency);
 
-      Order.create({
+      new Order({
         userId: req.user.id,
         server_order_id: id,
         amount,
@@ -34,8 +34,16 @@ exports.postcreateOrder = async (req, res, next) => {
         status,
         createdAt: created_at,
       })
+        .save()
         .then((order) => {
-          //   console.log("\n\n", order, "\n");
+          // console.log("\n\n", order, "\n");
+
+          // add order in user
+          req.user.orders.push(order._id);
+
+          return req.user.save();
+        })
+        .then(() => {
           return res.status(202).json({
             orderId: id,
             amount,
@@ -66,10 +74,10 @@ exports.verifyPayment = async (req, res) => {
       receipt,
     } = payDetails;
 
-    let userId = req.user.id;
+    let userId = req.user._id;
 
     // find order
-    let order = await Order.findOne({ where: { userId, receipt } });
+    let order = await Order.findOne({ userId, receipt });
     // get order id
 
     const { server_order_id } = order;
@@ -83,7 +91,7 @@ exports.verifyPayment = async (req, res) => {
 
     if (expectedSignature === razorpay_signature) {
       // update order status
-      await order.update({
+      await order.updateOne({
         razorpay_order_id,
         razorpay_payment_id,
         razorpay_signature,
@@ -91,7 +99,9 @@ exports.verifyPayment = async (req, res) => {
         status: "verified",
       });
 
-      await req.user.update({ membership: "premium" });
+      req.user.premium = true;
+
+      await req.user.save();
 
       return res.status(200).json({ signatureIsValid: true });
     }

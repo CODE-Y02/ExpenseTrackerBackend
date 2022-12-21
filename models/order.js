@@ -1,22 +1,30 @@
-const Sequelize = require("sequelize");
+const { Schema, model } = require("mongoose");
 
-const sequelize = require("../util/database");
+const orderSchema = new Schema({
+  server_order_id: String,
+  razorpay_order_id: String,
+  razorpay_payment_id: String,
+  razorpay_signature: String,
 
-const Order = sequelize.define("Order", {
-  server_order_id: Sequelize.STRING,
-  razorpay_order_id: Sequelize.STRING,
-  razorpay_payment_id: Sequelize.STRING,
-  razorpay_signature: Sequelize.STRING,
   isVarified: {
-    type: Sequelize.BOOLEAN,
-    allowNull: false,
-    defaultValue: false,
+    type: Boolean,
   },
-  amount: Sequelize.INTEGER,
-  receipt: {
-    type: Sequelize.STRING,
+
+  amount: {
+    type: Number,
   },
-  status: Sequelize.STRING,
+
+  receipt: String,
+
+  status: String,
+
+  createdAt: Date,
+
+  userId: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: "User",
+  },
 });
 
-module.exports = Order;
+module.exports = model("Order", orderSchema);
