@@ -23,7 +23,7 @@ const authentication = async (req, res, next) => {
 const isPremiumUser = async (req, res, next) => {
   try {
     const user = req.user;
-    if (user.membership == "premium") {
+    if (user.premium) {
       next();
     } else {
       return res.status(401).json({
