@@ -14,19 +14,19 @@ router.delete(
   expenseController.deleteExpense
 );
 
-// router.get(
-//   "/download",
-//   authentication,
-//   isPremiumUser,
-//   expenseController.downloadExpenseReport
-// );
+router.get(
+  "/download",
+  authentication,
+  isPremiumUser,
+  expenseController.downloadExpenseReport
+);
 
-// router.get(
-//   "/download/history",
-//   authentication,
-//   isPremiumUser,
-//   expenseController.getExpenseReportDownloadHistory
-// );
+router.get(
+  "/download/history",
+  authentication,
+  isPremiumUser,
+  expenseController.getExpenseReportDownloadHistory
+);
 
 router.get("", authentication, expenseController.getAllExpense);
 

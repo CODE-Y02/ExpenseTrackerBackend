@@ -1,13 +1,13 @@
 //models
 const Expense = require("../models/expense");
-
+const User = require("../models/user");
+const Download = require("../models/download");
 //utils
 const { convertFromJSON_to_CSV } = require("../util/converters");
 
 // services
 const { uploadToS3 } = require("../services/S3service");
 const { getExpenses, getDownloads } = require("../services/userServices");
-const user = require("../models/user");
 
 module.exports.postAddExpense = async (req, res, next) => {
   try {
@@ -23,6 +23,8 @@ module.exports.postAddExpense = async (req, res, next) => {
       category,
       description,
       user: req.user,
+      updatedAt: new Date(),
+      createdAt: new Date(),
     });
 
     await expense.save();
@@ -72,7 +74,7 @@ module.exports.getAllExpense = async (req, res, next) => {
     const offset = (page - 1) * limit;
 
     let expenses = await Expense.find({ user: req.user._id })
-      .select("expenseAmount catagory description")
+      // .select("expenseAmount category description")
       .limit(limit)
       .skip(offset);
 
@@ -178,86 +180,117 @@ module.exports.deleteExpense = async (req, res, next) => {
 };
 
 // //doenload expense
-// module.exports.downloadExpenseReport = async (req, res) => {
-//   try {
-//     // get
-//     let expenses = await getExpenses(req);
+module.exports.downloadExpenseReport = async (req, res) => {
+  try {
+    console.log("\n\n download ============> \n\n\n");
 
-//     if (expenses.length == 0) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "No Expense Found",
-//       });
-//     }
+    // get
+    let expenses = await Expense.find({ user: req.user }).select(
+      "_id expenseAmount category description createdAt updatedAt"
+    );
 
-//     expenses = expenses.map((expenseObj) => {
-//       const { id, expenseAmount, category, description, updatedAt, createdAt } =
-//         expenseObj;
-//       return {
-//         id,
-//         expenseAmount,
-//         category,
-//         description,
-//         createdAt,
-//         updatedAt,
-//       };
-//     });
+    if (expenses.length == 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No Expense Found",
+      });
+    }
 
-//     let csv = await convertFromJSON_to_CSV(expenses);
-//     //we are gonna send this csv to aws
+    // expenses = expenses.map((expenseObj) => {
+    //   const {
+    //     _id,
+    //     expenseAmount,
+    //     category,
+    //     description,
+    //     updatedAt,
+    //     createdAt,
+    //   } = expenseObj;
+    //   return {
+    //     id: _id,
+    //     expenseAmount,
+    //     category,
+    //     description,
+    //     createdAt,
+    //     updatedAt,
+    //   };
+    // });
 
-//     let fileName = `Expense${req.user.id}/${new Date()}.csv`; // will creare folder --> ExpenseUSERID -->  filennameusingDate.csv
-//     // csv = JSON.stringify(csv);
-//     let fileUrl = await uploadToS3(csv, fileName); // data and filename
+    let csv = await convertFromJSON_to_CSV(expenses);
+    //we are gonna send this csv to aws
 
-//     // console.log("\n\n=================> url \n", fileUrl, "\n\n");
+    // console.log(csv);
 
-//     if (!fileUrl) {
-//       return res
-//         .status(404)
-//         .json({ success: false, message: "Source Not Found" });
-//     }
+    // UNCOMMENT 👇 to use aws
+    /*
+    let fileName = `Expense${req.user.id}/${new Date()}.csv`; // will creare folder --> ExpenseUSERID -->  filennameusingDate.csv
+    // csv = JSON.stringify(csv);
+    let fileUrl = await uploadToS3(csv, fileName); // data and filename
 
-//     //save as history in db
-//     await req.user.createDownload({
-//       type: "expenseReport",
-//       fileUrl,
-//       folder: `Expense${req.user.id}`,
-//       fileName,
-//     });
+    // console.log("\n\n=================> url \n", fileUrl, "\n\n");
 
-//     res.status(200).json({ success: true, fileName, fileUrl });
-//   } catch (error) {
-//     console.log("\n\n Err in download report \n ", error, "\n\n");
-//     res.status(500).json({ success: false, error });
-//   }
-// };
+    if (!fileUrl) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Source Not Found" });
+    }
+    */
+
+    let download = await new Download({
+      type: "expenseReport",
+      fileUrl: "https://picsum.photos/200/300", // replace with file url
+      folder: `Expense${req.user.id}`,
+      fileName: "test file", // replace with file name
+      downloadedAt: new Date(),
+
+      user: {
+        userId: req.user._id,
+        name: req.user.name,
+        email: req.user.email,
+      },
+    }).save();
+
+    if (download) {
+      res.status(200).json({
+        success: true,
+        fileName: download.fileName,
+        fileUrl: download.fileUrl,
+      });
+    } else {
+      throw Error("Cannot download file try again later");
+    }
+  } catch (error) {
+    console.log("\n\n Err in download report \n ", error, "\n\n");
+    res.status(500).json({ success: false, error });
+  }
+};
 
 // get download history
-// module.exports.getExpenseReportDownloadHistory = async (req, res) => {
-//   try {
-//     const where = {
-//       type: "expenseReport",
-//     };
-//     let history = await getDownloads(req, where);
+module.exports.getExpenseReportDownloadHistory = async (req, res) => {
+  try {
+    let history = await Download.find({
+      "user.userId": req.user._id,
+      type: "expenseReport",
+    }).select("-user -__v");
 
-//     if (!history) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "No download history Found",
-//       });
-//     }
+    console.log("\n\n\n download history =======> \n\n", history);
 
-//     // if history found then
-//     res.json({
-//       success: true,
-//       history,
-//     });
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).json({
-//       success: false,
-//       message: error.message,
-//     });
-//   }
-// };
+    if (!history || history.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No download history Found",
+      });
+    }
+
+    // if history found then
+    res.json({
+      success: true,
+      history,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

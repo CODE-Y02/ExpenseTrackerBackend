@@ -17,6 +17,10 @@ const expenseSchema = new Schema({
     required: true,
     ref: "User",
   },
+
+  updatedAt: Date,
+
+  createdAt: Date,
 });
 
 module.exports = model("Expense", expenseSchema);
