@@ -31,21 +31,6 @@ module.exports.postAddExpense = async (req, res, next) => {
 
     await req.user.addExpense(expense);
 
-    //  leaderboard
-
-    // let leaderBoard = await req.user.getLeaderBoard();
-    // console.log("\n\n leaderboard=====> \n\n", leaderBoard, "\n\n");
-    // if (!leaderBoard) {
-    //   leaderBoard = await req.user.createLeaderBoard({
-    //     userName: req.user.name,
-    //   });
-    // }
-
-    // console.log("\n\n leaderboard=====> \n\n", leaderBoard, "\n\n");
-
-    // let total = leaderBoard.totalExpenses + Number(expenseAmount);
-    // leaderBoard.update({ totalExpenses: total });
-
     res
       .status(201)
       .json({ success: true, message: "Expense added successfully", expense });
@@ -156,19 +141,6 @@ module.exports.deleteExpense = async (req, res, next) => {
       },
     });
 
-    //  leaderboard
-
-    // let leaderBoard = await req.user.getLeaderBoard();
-    // if (!leaderBoard) {
-    //   leaderBoard = await req.user.createLeaderBoard({
-    //     userName: req.user.name,
-    //   });
-    // }
-
-    // let total = leaderBoard.totalExpenses - Number(expense.expenseAmount);
-    // leaderBoard.update({ totalExpenses: total });
-
-    // await expense.destroy();
     res.json({ success: true, message: "Expense Deleted Successfully" });
   } catch (error) {
     console.log(error);

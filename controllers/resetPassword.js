@@ -13,13 +13,6 @@ exports.forgotPass = async (req, res, next) => {
   try {
     const { email } = req.body;
 
-    // console.log(
-    //   "\n \nAPI =========================>\n",
-    //   process.env.SENDGRID_API_KEY
-    // );
-
-    // console.log(email);
-
     let user = await User.findOne({ email: email });
 
     if (!user) {

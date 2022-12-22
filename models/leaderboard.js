@@ -1,25 +1,25 @@
-const Sequelize = require("sequelize");
+// const Sequelize = require("sequelize");
 
-const sequelize = require("../util/database");
+// const sequelize = require("../util/database");
 
-// create new model
-const LeaderBoard = sequelize.define("leaderBoard", {
-  id: {
-    type: Sequelize.INTEGER,
-    autoIncrement: true,
-    allowNull: false,
-    primaryKey: true,
-  },
+// // create new model
+// const LeaderBoard = sequelize.define("leaderBoard", {
+//   id: {
+//     type: Sequelize.INTEGER,
+//     autoIncrement: true,
+//     allowNull: false,
+//     primaryKey: true,
+//   },
 
-  totalExpenses: {
-    type: Sequelize.INTEGER,
-    allowNull: false,
-    defaultValue: 0,
-  },
+//   totalExpenses: {
+//     type: Sequelize.INTEGER,
+//     allowNull: false,
+//     defaultValue: 0,
+//   },
 
-  userName: {
-    type: Sequelize.STRING,
-  },
-});
+//   userName: {
+//     type: Sequelize.STRING,
+//   },
+// });
 
-module.exports = LeaderBoard;
+// module.exports = LeaderBoard;
