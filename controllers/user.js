@@ -69,7 +69,7 @@ exports.postSignIn = async (req, res, next) => {
           success: true,
           message: "Login successfull",
           Token: generateAccessToken(user[0].id, user[0].name),
-          memberhip: premium,
+          membership: premium,
         });
       } else {
         return res.status(401).json({
