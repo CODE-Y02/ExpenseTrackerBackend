@@ -1,23 +1,27 @@
-const LeaderBoard = require("../models/leaderboard");
-
 const Expense = require("../models/expense");
+
+const User = require("../models/user");
 
 exports.showAllLeaderbord = async (req, res) => {
   try {
     let user = req.user;
 
-    if (user.membership == "free") {
+    if (user.premium === undefined || !user.premium) {
       return res.status(401).json({
         success: false,
         message: "Buy Premium Membership To access this feature",
       });
     }
 
-    let leaderboard = await LeaderBoard.findAll({
-      order: [["totalExpenses", "DESC"]],
-    });
+    let leaderboard = await User.find()
+      .select("name expenseDetails.total _id")
+      .sort({ "expenseDetails.total": -1 });
+    // .populate("expenseDetails.expenses" );
 
-    res.json({ requestUserId: req.user.id, leaderboard });
+    res.json({
+      requestUserId: req.user._id,
+      leaderboard,
+    });
   } catch (error) {
     console.log("\n showAllLeaderbord ==> \n ", error);
 
@@ -31,18 +35,16 @@ exports.showUserExpense = async (req, res) => {
 
     let userId = req.body.userId;
 
-    if (user.membership == "free") {
+    if (user.premium === undefined || !user.premium) {
       return res.status(401).json({
         success: false,
         message: "Buy Premium Membership To access this feature",
       });
     }
 
-    let usersExp = await Expense.findAll({
-      where: {
-        userId,
-      },
-    });
+    let usersExp = await User.findById({ _id: userId })
+      .select("expenseDetails.expenses")
+      .populate("expenseDetails.expenses");
 
     if (usersExp.length == 0) {
       return res.json({

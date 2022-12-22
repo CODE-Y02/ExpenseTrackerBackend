@@ -27,8 +27,8 @@ app.use(bodyParser.json());
 const userRoutes = require("./routes/user");
 const expenseRouter = require("./routes/expense");
 const paymentRouter = require("./routes/payment");
-// const passwordRoute = require("./routes/password");
-// const leaderBoardRoute = require("./routes/leaderboard");
+const passwordRoute = require("./routes/password");
+const leaderBoardRoute = require("./routes/leaderboard");
 
 // import models
 // const User = require("./models/user");
@@ -72,8 +72,8 @@ app.use("/user", userRoutes);
 app.use("/expense", expenseRouter);
 app.use("/payment", paymentRouter);
 
-// app.use("/password", passwordRoute);
-// app.use("/leaderboard", leaderBoardRoute);
+app.use("/password", passwordRoute);
+app.use("/leaderboard", leaderBoardRoute);
 
 app.use("/", (req, res) => {
   res.status(404).json({ success: false, message: "Page Not Found " });
